@@ -17,7 +17,7 @@ namespace KhachSan.Security
                 OracleConnection connection = DAO.Access.Connect_To("LBACSYS", "123");
                 OracleCommand cm = new OracleCommand();
                 cm.Connection = connection;
-                cm.CommandText = "SET_LEVEL_OLS_SCHEMA_NHOM10_FOR_USER";
+                cm.CommandText = "LBACSYS.SET_LEVEL_OLS_SCHEMA_NHOM10_FOR_USER";
                 cm.CommandType = CommandType.StoredProcedure;
                 cm.Parameters.Add("USERNAME", OracleDbType.Varchar2, 50, ParameterDirection.Input).Value = Username;
                 cm.Parameters.Add("POSITION", OracleDbType.NVarchar2, 50, ParameterDirection.Input).Value = Position;

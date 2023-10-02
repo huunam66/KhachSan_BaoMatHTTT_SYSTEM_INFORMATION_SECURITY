@@ -116,8 +116,6 @@
     <Compile Include="DAO\Access.cs" />
     <Compile Include="DAO\Account.cs" />
     <Compile Include="DAO\Bill.cs" />
-    <Compile Include="DAO\Bill_Details.cs" />
-    <Compile Include="DAO\Booking.cs" />
     <Compile Include="DAO\Client.cs" />
     <Compile Include="DAO\Room.cs" />
     <Compile Include="Security\GRANT.cs" />

@@ -16,6 +16,10 @@ namespace KhachSan.DAO
         {
             Access.User = User.ToUpper();
         }
+        public static String getUser()
+        {
+            return Access.User;
+        }
         public static void setPassword(String Password)
         {
             Access.Password = Password;
@@ -23,8 +27,10 @@ namespace KhachSan.DAO
 
         public static OracleConnection Connect()
         {
+            String as_SYSDBA = User.ToUpper().Equals("SYS") ? "DBA Privilege=SYSDBA;" : "";
             String Source = "DATA SOURCE=localhost:1521/" + Access.Container +
-                            ";USER ID=" + Access.User + "; PASSWORD=" + Access.Password + ";";
+                            ";USER ID=" + Access.User + "; PASSWORD=" + Access.Password + ";"
+                            + as_SYSDBA;
             Connection = new OracleConnection(Source);
             Connection.Open();
             return Connection;
@@ -32,8 +38,10 @@ namespace KhachSan.DAO
 
         public static OracleConnection Connect_To(String User1, String Password1)
         {
+            String as_SYSDBA = User1.ToUpper().Equals("SYS") ? "DBA Privilege=SYSDBA;" : "";
             String Source = "DATA SOURCE=localhost:1521/" + Access.Container +
-                            ";USER ID=" + User1 + "; PASSWORD=" + Password1 + ";";
+                            ";USER ID=" + User1 + "; PASSWORD=" + Password1 + ";"
+                            + as_SYSDBA;
             OracleConnection oracleConnection = new OracleConnection(Source);
             oracleConnection.Open();
             return oracleConnection;

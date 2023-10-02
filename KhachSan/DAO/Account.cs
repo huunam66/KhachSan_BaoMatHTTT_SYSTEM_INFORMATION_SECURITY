@@ -35,7 +35,7 @@ namespace KhachSan.DAO
             try
             {
                 OracleConnection connection = Access.Connect();
-                String query = "SELECT * FROM nhom10.ACCOUNT WHERE USERNAME = '" + Username + "'";
+                String query = "SELECT * FROM nhom10.ACCOUNT WHERE UPPER(USERNAME) = '" + Username.ToUpper() + "'";
                 OracleCommand cm = new OracleCommand(query, connection);
                 cm.CommandType = CommandType.Text;
                 OracleDataReader reader = cm.ExecuteReader();
@@ -103,9 +103,6 @@ namespace KhachSan.DAO
 
                 if (cm.ExecuteNonQuery() != 0)
                 {
-                    Respone = Security.Site.GRANT.GRANT_PRIVILEGES_ROLES(ac) ? "TRUE" : "FALSE";
-                    if (!Respone.Equals("TRUE")) return "Gán quyền thất bại !";
-
                     String Password_MD5_Encrypted = Security.Site.MD5.Encrypt(ac.Password);
 
                     query = "INSERT INTO nhom10.ACCOUNT(STAFF_ID, USERNAME, PASSWORD, ROLE) "
@@ -115,11 +112,14 @@ namespace KhachSan.DAO
 
                     if (cm.ExecuteNonQuery() == 0) return "Lỗi tạo tài khoản !";
 
+                    Boolean Done = Security.Site.GRANT.GRANT_PRIVILEGES_ROLES(ac);
+                    if (!Done) return "Gán quyền thất bại !";
+
                     // LBACSYS gán nhãn truy cập tùy quyền cho USER (Tài khoản nhân viên) vừa tạo
 
-                    Boolean Done_set_level = Security.Site.OLS.Set_level_OLS_FOR_USER(ac.Username, ac.Role);
+                    Done = Security.Site.OLS.Set_level_OLS_FOR_USER(ac.Username, ac.Role);
 
-                    return Done_set_level ? "Tạo tài khoản thành công !" : "Lỗi tạo tài khoản !";
+                    return Done ? "Tạo tài khoản thành công !" : "Gán nhãn bảo mật thất bại, Lỗi tạo tài khoản !";
                 }
                 String q = "DROP USER " + ac.Username + " CASCADE";
                 cm.CommandText = q;
@@ -159,6 +159,13 @@ namespace KhachSan.DAO
                 DTO.Account ac = findOne(id);
                 if (ac == null) return "Không tồn tại tài khoản !";
 
+                DTO.Account ac_current = findOne(Access.getUser());
+                if (ac_current != null 
+                    && ac_current.Username.ToUpper().Equals(ac.Username.ToUpper()))
+                {
+                    return "Bạn không thể xóa chính bạn !";
+                }
+
                 String query = "DROP USER " + ac.Username + " CASCADE";
                 OracleConnection connection = DAO.Access.Connect();
                 OracleCommand cm = new OracleCommand(query, connection);
@@ -186,16 +193,16 @@ namespace KhachSan.DAO
                 cm.CommandType = CommandType.Text;
                 if(cm.ExecuteNonQuery() == 0) return "Lỗi cập nhật dữ liệu tài khoản !";
 
-                String Respone = Security.Site.REVOKE.REVOKE_PRIVILEGES_ROLES(ac.Username, old_ROLE) ? "TRUE" : "FALSE";
-                if (!Respone.Equals("TRUE")) return "Gỡ bỏ quyền cũ thất bại !";
+                Boolean Done = Security.Site.REVOKE.REVOKE_PRIVILEGES_ROLES(ac.Username, old_ROLE);
+                if (!Done) return "Gỡ bỏ quyền cũ thất bại !";
 
-                Respone = Security.Site.GRANT.GRANT_PRIVILEGES_ROLES(ac) ? "TRUE" : "FALSE";
-                if (!Respone.Equals("TRUE")) return "Gán quyền mới thất bại !";
+                Done = Security.Site.GRANT.GRANT_PRIVILEGES_ROLES(ac);
+                if (!Done) return "Gán quyền mới thất bại !";
 
                 // LBACSYS gán nhãn truy cập tùy quyền cho USER (Tài khoản nhân viên) vừa cập nhật POSITION
-                Boolean Done_set_level = Security.Site.OLS.Set_level_OLS_FOR_USER(ac.Username, ac.Role);
+                Done = Security.Site.OLS.Set_level_OLS_FOR_USER(ac.Username, ac.Role);
 
-                return Done_set_level ? "Cập nhật lại quyền User thành công !" : "Cập nhật lại quyền User thất bại !";
+                return Done ? "Cập nhật thành công !" : "Cập nhật nhãn bảo mật thất bại, Cập nhật thất bại !";
             }
             catch(Exception e) { return "Cập nhật lại quyền User thất bại !"; }
         }

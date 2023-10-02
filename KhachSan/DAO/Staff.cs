@@ -185,7 +185,7 @@ namespace KhachSan.DAO
                 if (Result_Symmetric_Encrypt == null) return "Error Result_Symmetric_Encrypt !";
 
                 int len = Result_Symmetric_Encrypt.Length;
-                query = "INSERT INTO KEY_SECURE(STAFF_ID, PUBLIC_KEY, PRIVATE_KEY, SYMMETRIC_KEY) " +
+                query = "INSERT INTO nhom10.KEY_SECURE(STAFF_ID, PUBLIC_KEY, PRIVATE_KEY, SYMMETRIC_KEY) " +
                         "VALUES(" + id + ", '" + public_Key + "', '" + Result_Symmetric_Encrypt + "', '" + symmetric_key + "')";
 
                 cm.CommandText = query;
@@ -202,24 +202,17 @@ namespace KhachSan.DAO
             { return "Thêm mới thất bại !"; }
         }
 
-        public String deleteOne(String id)
+        public String deleteOne(long id)
         {
             try
             {
-                String query = "SELECT USERNAME FROM nhom10.ACCOUNT WHERE STAFF_ID = " + id;
+                String Drop_User = Source.Account.Drop_User(id);
+                if (Drop_User.Equals("Bạn không thể xóa chính bạn !")) 
+                    return Drop_User;
+
+                String query = "DELETE FROM nhom10.STAFF WHERE ID = " + id;
                 OracleConnection connection = Access.Connect();
                 OracleCommand cm = new OracleCommand(query, connection);
-                cm.CommandType = CommandType.Text;
-                OracleDataReader reader = cm.ExecuteReader();
-                if (reader.Read())
-                {
-                    query = "DROP USER " + reader.GetString(0) + " CASCADE";
-                    cm.CommandText = query;
-                    cm.CommandType = CommandType.Text;
-                    cm.ExecuteNonQuery();
-                }
-
-                query = "DELETE FROM nhom10.STAFF WHERE ID = " + id;
                 cm.CommandText = query;
                 cm.CommandType = CommandType.Text;
                 return cm.ExecuteNonQuery() != 0 ? "Xóa thành công !" : "Lỗi phiên xóa !";
@@ -265,7 +258,9 @@ namespace KhachSan.DAO
                 cm.CommandText = query;
                 cm.CommandType = CommandType.Text;
 
-                return cm.ExecuteNonQuery() != 0 ? "Cập nhật thành công !" : "Cập nhật không thành công !";
+                if (cm.ExecuteNonQuery() == 0) return "Cập nhật không thành công !";
+
+                return Source.Account.updateROLE(st.ID, st.Position, Old_Position);
             }
             catch (Exception e) { return "Cập nhật thất bại !"; }
         }

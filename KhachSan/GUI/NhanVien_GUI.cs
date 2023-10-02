@@ -239,7 +239,7 @@ namespace KhachSan.GUI
             int row_index = table_employee.CurrentCell.RowIndex;
 
             DataGridViewRow row = table_employee.Rows[row_index];
-            String id = row.Cells[0].Value.ToString();
+            long id = long.Parse(row.Cells[0].Value.ToString());
             String Respone = DAO.Source.Staff.deleteOne(id);
             MessageBox.Show(Respone, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             if(Respone.Contains("thành công !"))
@@ -293,6 +293,8 @@ namespace KhachSan.GUI
 
             load_data_table_employee();
             load_data_table_account();
+            txt_username.Text = "";
+            txt_password.Text = "";
         }
 
         private void btnDrop_ac_Click(object sender, EventArgs e)

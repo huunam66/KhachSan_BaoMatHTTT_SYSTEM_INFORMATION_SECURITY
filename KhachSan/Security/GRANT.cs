@@ -15,7 +15,7 @@ namespace KhachSan.Security
             OracleConnection connection = DAO.Access.Connect_To("SYS", "123");
             OracleCommand cm = new OracleCommand();
             cm.Connection = connection;
-            cm.CommandText = "nhom10.GRANT_PRIVILEGES_ROLES";
+            cm.CommandText = "SYS.GRANT_PRIVILEGES_ROLES_SCHEMA_NHOM10";
             cm.CommandType = CommandType.StoredProcedure;
             cm.Parameters.Add("USERNAME", OracleDbType.Varchar2, 50, ParameterDirection.Input).Value = ac.Username;
             cm.Parameters.Add("NEW_POSITION", OracleDbType.NVarchar2, 50, ParameterDirection.Input).Value = ac.Role;

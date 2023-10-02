@@ -103,13 +103,7 @@ namespace KhachSan.DAO
 
                 if (cm.ExecuteNonQuery() != 0)
                 {
-                    cm.CommandText = "nhom10.GRANT_PRIVILEGES_ROLES";
-                    cm.CommandType = CommandType.StoredProcedure;
-                    cm.Parameters.Add("USERNAME", OracleDbType.Varchar2, 50, ParameterDirection.Input).Value = ac.Username;
-                    cm.Parameters.Add("NEW_POSITION", OracleDbType.NVarchar2, 50, ParameterDirection.Input).Value = ac.Role;
-                    cm.Parameters.Add("RESPONE", OracleDbType.Varchar2, 50).Direction = ParameterDirection.Output;
-                    cm.ExecuteNonQuery();
-                    Respone = cm.Parameters["RESPONE"].Value.ToString();
+                    Respone = Security.Site.GRANT.GRANT_PRIVILEGES_ROLES(ac) ? "TRUE" : "FALSE";
                     if (!Respone.Equals("TRUE")) return "Gán quyền thất bại !";
 
                     String Password_MD5_Encrypted = Security.Site.MD5.Encrypt(ac.Password);
@@ -191,23 +185,11 @@ namespace KhachSan.DAO
                 OracleCommand cm = new OracleCommand(query, connection);
                 cm.CommandType = CommandType.Text;
                 if(cm.ExecuteNonQuery() == 0) return "Lỗi cập nhật dữ liệu tài khoản !";
-     
-                cm.CommandText = "nhom10.REVOKE_PRIVILEGES_ROLES";
-                cm.CommandType = CommandType.StoredProcedure;
-                cm.Parameters.Add("USERNAME", OracleDbType.Varchar2, 50, ParameterDirection.Input).Value = ac.Username;
-                cm.Parameters.Add("OLD_POSITION", OracleDbType.NVarchar2, 50, ParameterDirection.Input).Value = old_ROLE;
-                cm.Parameters.Add("RESPONE", OracleDbType.Varchar2, 50).Direction = ParameterDirection.Output;
-                cm.ExecuteNonQuery();
-                String Respone = cm.Parameters["RESPONE"].Value.ToString();
+
+                String Respone = Security.Site.REVOKE.REVOKE_PRIVILEGES_ROLES(ac.Username, old_ROLE) ? "TRUE" : "FALSE";
                 if (!Respone.Equals("TRUE")) return "Gỡ bỏ quyền cũ thất bại !";
 
-                cm.CommandText = "nhom10.GRANT_PRIVILEGES_ROLES";
-                cm.CommandType = CommandType.StoredProcedure;
-                cm.Parameters.Add("USERNAME", OracleDbType.Varchar2, 50, ParameterDirection.Input).Value = ac.Username;
-                cm.Parameters.Add("NEW_POSITION", OracleDbType.NVarchar2, 50, ParameterDirection.Input).Value = ac.Role;
-                cm.Parameters.Add("RESPONE", OracleDbType.Varchar2, 50).Direction = ParameterDirection.Output;
-                cm.ExecuteNonQuery();
-                Respone = cm.Parameters["RESPONE"].Value.ToString();
+                Respone = Security.Site.GRANT.GRANT_PRIVILEGES_ROLES(ac) ? "TRUE" : "FALSE";
                 if (!Respone.Equals("TRUE")) return "Gán quyền mới thất bại !";
 
                 // LBACSYS gán nhãn truy cập tùy quyền cho USER (Tài khoản nhân viên) vừa cập nhật POSITION

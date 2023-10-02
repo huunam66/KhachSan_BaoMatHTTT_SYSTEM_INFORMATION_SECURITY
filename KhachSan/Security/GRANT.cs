@@ -10,12 +10,20 @@ namespace KhachSan.Security
 {
     class GRANT
     {
-        public Boolean GRANT_PRIVILEGES_ROLES()
+        public Boolean GRANT_PRIVILEGES_ROLES(DTO.Account ac)
         {
             OracleConnection connection = DAO.Access.Connect_To("SYS", "123");
+            OracleCommand cm = new OracleCommand();
+            cm.Connection = connection;
+            cm.CommandText = "nhom10.GRANT_PRIVILEGES_ROLES";
+            cm.CommandType = CommandType.StoredProcedure;
+            cm.Parameters.Add("USERNAME", OracleDbType.Varchar2, 50, ParameterDirection.Input).Value = ac.Username;
+            cm.Parameters.Add("NEW_POSITION", OracleDbType.NVarchar2, 50, ParameterDirection.Input).Value = ac.Role;
+            cm.Parameters.Add("RESPONE", OracleDbType.Varchar2, 50).Direction = ParameterDirection.Output;
+            cm.ExecuteNonQuery();
 
+            String Respone = cm.Parameters["RESPONE"].Value.ToString();
+            return Respone.Equals("TRUE") ? true : false;
         }
-
-
     }
 }
